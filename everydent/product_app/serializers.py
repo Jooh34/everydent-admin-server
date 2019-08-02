@@ -1,29 +1,41 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from .models import Manufacturer, ProductInfo
+from .models import Manufacturer, ProductInfo, Product
 
-# 제조사 시리얼라이저
 class ManufacturerSerializer(serializers.ModelSerializer):
+    product_info_count = serializers.SerializerMethodField()
+
+    def get_product_info_count(self, obj):
+        return ProductInfo.objects.filter(manufacturer=obj).count()
+
     class Meta:
         model = Manufacturer
-        fields = ("id", "name")
+        fields = ("id", "name", "code", "product_info_count")
 
-# 제품 정보 시리얼라이저
 class ProductInfoSerializer(serializers.ModelSerializer):
+    manufacturer_name = serializers.CharField(source='manufacturer.name')
+    product_count = serializers.SerializerMethodField()
+
+    def get_product_count(self, obj):
+        return Product.objects.filter(product_info=obj).count()
+
     class Meta:
         model = ProductInfo
-        fields = ("id", "name", "code", "manufacturer")
-#
-# # 제품 재고 추가 시리얼라이저
-# class CreateProductSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ("id", "username", "password")
-#         extra_kwargs = {"password": {"write_only": True}}
-#
-#     def create(self, validated_data):
-#         user = User.objects.create_user(
-#             validated_data["username"], None, validated_data["password"]
-#         )
-#         return user
+        fields = ("id", "name", "code", "manufacturer", "manufacturer_name", "product_count")
+
+# 제품 재고 시리얼라이저
+class ProductSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField('_user')
+
+    def _user(self, obj):
+        request = getattr(self.context, 'request', None)
+        if request:
+            if request.user:
+                return request.user
+            else:
+                return None
+
+    class Meta:
+        model = Product
+        fields = ("id", "created_time", "product_info", "full_code", "owner", "made_date", "expire_date")
