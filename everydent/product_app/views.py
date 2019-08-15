@@ -83,7 +83,7 @@ def product_info_list(request):
     #         return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 def product_list(request):
     if request.method == 'GET':
         product_list = Product.objects.all().order_by("id")
@@ -98,7 +98,15 @@ def product_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+    elif request.method == 'DELETE':
+        full_code = request.data.get('full_code', '')
+        products = Product.objects.filter(full_code=full_code)
+        if len(products) > 0:
+            products[0].delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'PUT'])
 def product_detail(request, pk):
     try:
         product = Product.objects.get(pk=pk)
@@ -115,7 +123,3 @@ def product_detail(request, pk):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
