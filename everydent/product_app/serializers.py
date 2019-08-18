@@ -27,6 +27,8 @@ class ProductInfoSerializer(serializers.ModelSerializer):
 # 제품 재고 시리얼라이저
 class ProductSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField('_user')
+    expiry_start = serializers.DateField(format="%Y-%m-%d", input_formats=['%Y-%m-%d', 'iso-8601'])
+    expiry_end = serializers.DateField(format="%Y-%m-%d", input_formats=['%Y-%m-%d', 'iso-8601'])
 
     def _user(self, obj):
         request = getattr(self.context, 'request', None)
@@ -38,4 +40,4 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "created_time", "product_info", "full_code", "owner", "made_date", "expire_date")
+        fields = ("id", "created_time", "product_info", "full_code", "owner", "expiry_start", "expiry_end")

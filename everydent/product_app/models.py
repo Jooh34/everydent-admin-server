@@ -15,5 +15,5 @@ class Product(models.Model):
     product_info = models.ForeignKey(ProductInfo, related_name='products', on_delete=models.CASCADE)
     full_code = models.CharField(max_length=100, default='')
     owner = models.ForeignKey(User, related_name="owners", on_delete=models.SET_NULL, null=True)
-    made_date = models.DateField(null=True)
-    expire_date = models.DateField(null=True)
+    expiry_start = models.DateField(null=True)
+    expiry_end = models.DateField(null=True)
