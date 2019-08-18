@@ -91,11 +91,27 @@ def product_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        error_message = []
+
+        stock_list = request.data
+        for stock in stock_list:
+            serializer = ProductSerializer(data=stock)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                error_message.append(serializer.errors)
+
+        print(len(error_message))
+        if len(error_message) == 0:
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+
+        # serializer = ProductSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     elif request.method == 'DELETE':
