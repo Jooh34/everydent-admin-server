@@ -103,6 +103,7 @@ def product_list(request):
         products = Product.objects.filter(full_code=full_code)
         if len(products) > 0:
             products[0].delete()
+            return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
