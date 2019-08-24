@@ -23,6 +23,8 @@ urlpatterns = [
     path('auth/', include('auth.urls')),
     url(r"^auth", include("knox.urls")),
 
+    path('bot/', include('chat_bot.urls')),
+
     path('', include('product_app.urls')),
 
 ]
