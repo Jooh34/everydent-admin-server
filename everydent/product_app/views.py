@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,6 +18,14 @@ def count_info(request):
         }
         return Response(data)
 
+@api_view(['GET'])
+def expiry_list(request):
+    THRESHOLD_DAYS = 2000
+    if request.method == 'GET':
+        time_threshold = datetime.now() + timedelta(days=THRESHOLD_DAYS)
+        expiry_list = Product.objects.filter(expiry_end__lt=time_threshold)
+        serializer = ProductSerializer(expiry_list, many=True)
+        return Response(serializer.data)
 
 @api_view(['GET', 'POST'])
 def manufacturer_list(request):
