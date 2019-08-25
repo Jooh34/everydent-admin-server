@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'corsheaders',
-    'django_crontab',
     'product_app',
 ]
 
@@ -132,7 +131,3 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
 }
-
-CRONJOBS = [
-    ('*/1 * * * *', 'product_app.cron.alert_expiry_time')
-]

@@ -111,7 +111,6 @@ def product_list(request):
             else:
                 error_message.append(serializer.errors)
 
-        print(len(error_message))
         if len(error_message) == 0:
             return Response(status=status.HTTP_201_CREATED)
         else:
@@ -133,14 +132,16 @@ def product_list(request):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def product_detail(request, pk):
     try:
         product = Product.objects.get(pk=pk)
     except Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    print(request.method)
     if request.method == 'GET':
+        print('why get?')
         serializer = ProductSerializer(product)
         return Response(serializer.data)
 
@@ -150,3 +151,23 @@ def product_detail(request, pk):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        name = ProductInfo.objects.get(pk=product.product_info.id).name
+        product.delete()
+        return Response({'name': name}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+def stock_list(request, product_info_id):
+    try:
+        product_info = ProductInfo.objects.get(id=product_info_id)
+    except ProductInfo.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    stock_list = Product.objects.filter(product_info=product_info)
+
+    if request.method == 'GET':
+        serializer = ProductSerializer(stock_list, many=True)
+        return Response(serializer.data)
