@@ -124,7 +124,7 @@ def product_list(request):
 
         stock_list = request.data
         for stock in stock_list:
-            serializer = ProductSerializer(data=stock)
+            serializer = ProductSerializer(data=stock, partial=True)
             if serializer.is_valid():
                 serializer.save()
             else:
