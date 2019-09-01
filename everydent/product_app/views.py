@@ -77,6 +77,13 @@ def product_info_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET', 'POST'])
+def product_info_detail(request, pk):
+    if request.method == 'GET':
+        product_info = ProductInfo.objects.get(pk=pk)
+        serializer = ProductInfoSerializer(product_info)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     # elif request.method == 'POST':
     #     serializer = ProductInfoSerializer(data=request.data)
     #
