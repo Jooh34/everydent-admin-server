@@ -77,12 +77,24 @@ def product_info_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 def product_info_detail(request, pk):
     if request.method == 'GET':
         product_info = ProductInfo.objects.get(pk=pk)
         serializer = ProductInfoSerializer(product_info)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        product_info = ProductInfo.objects.get(pk=pk)
+        name = product_info.name
+        product_info.delete()
+        return Response({'name': name}, status=status.HTTP_200_OK)
+
+    elif request.method == 'POST':
+        product_info = ProductInfo.objects.get(pk=pk)
+        product_info.name = request.data['name']
+        product_info.save()
+        return Response(status=status.HTTP_200_OK)
 
     # elif request.method == 'POST':
     #     serializer = ProductInfoSerializer(data=request.data)
