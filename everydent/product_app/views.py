@@ -20,11 +20,23 @@ def count_info(request):
 
 @api_view(['GET'])
 def expiry_list(request):
-    THRESHOLD_DAYS = 2000
+    THRESHOLD_DAYS = 365
     if request.method == 'GET':
         time_threshold = datetime.now() + timedelta(days=THRESHOLD_DAYS)
         expiry_list = Product.objects.filter(expiry_end__lt=time_threshold)
         serializer = ProductSerializer(expiry_list, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET'])
+def running_out_list(request):
+    THRESHOLD_COUNTS = 5
+    if request.method == 'GET':
+        result = set()
+        for productinfo in ProductInfo.objects.all():
+            if productinfo.product_set.count() <= THRESHOLD_COUNTS:
+                result.add(productinfo)
+
+        serializer = ProductInfoSerializer(result, many=True)
         return Response(serializer.data)
 
 @api_view(['GET', 'POST'])

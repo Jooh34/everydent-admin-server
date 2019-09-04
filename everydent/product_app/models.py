@@ -12,7 +12,7 @@ class ProductInfo(models.Model):
 
 class Product(models.Model):
     created_time = models.DateTimeField(auto_now=False, auto_now_add=True)
-    product_info = models.ForeignKey(ProductInfo, related_name='products', on_delete=models.CASCADE)
+    product_info = models.ForeignKey(ProductInfo, related_name='product_set', on_delete=models.CASCADE)
     full_code = models.CharField(max_length=100, default='')
     owner = models.ForeignKey(User, related_name="owners", on_delete=models.SET_NULL, null=True)
     expiry_start = models.DateField(null=True)
