@@ -8,6 +8,8 @@ from rest_framework import status
 from .models import Manufacturer, ProductInfo, Product
 from .serializers import ManufacturerSerializer, ProductInfoSerializer, ProductSerializer
 
+import re
+
 @api_view(['GET'])
 def count_info(request):
     if request.method == 'GET':
@@ -78,7 +80,11 @@ def manufacturer_detail(request, pk):
 @api_view(['GET', 'POST'])
 def product_info_list(request):
     if request.method == 'GET':
-        product_info_list = ProductInfo.objects.all().order_by("id")
+        product_info_list = ProductInfo.objects.all().order_by("name")
+        convert = lambda text: int(text) if text.isdigit() else text
+        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key.name) ]
+        product_info_list = sorted( product_info_list, key=alphanum_key )
+
         serializer = ProductInfoSerializer(product_info_list, many=True)
         return Response(serializer.data)
 
