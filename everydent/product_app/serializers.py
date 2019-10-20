@@ -16,13 +16,17 @@ class ManufacturerSerializer(serializers.ModelSerializer):
 class ProductInfoSerializer(serializers.ModelSerializer):
     manufacturer_name = serializers.CharField(source='manufacturer.name')
     product_count = serializers.SerializerMethodField()
+    returned_count = serializers.SerializerMethodField()
 
     def get_product_count(self, obj):
-        return Product.objects.filter(product_info=obj).count()
+        return Product.objects.filter(status=1, product_info=obj).count()
+
+    def get_returned_count(self, obj):
+        return Product.objects.filter(status=3, product_info=obj).count()
 
     class Meta:
         model = ProductInfo
-        fields = ("id", "name", "code", "manufacturer", "manufacturer_name", "product_count")
+        fields = ("id", "name", "code", "manufacturer", "manufacturer_name", "product_count", "returned_count")
 
 # 제품 재고 시리얼라이저
 class ProductSerializer(serializers.ModelSerializer):

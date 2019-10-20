@@ -17,3 +17,10 @@ class Product(models.Model):
     owner = models.ForeignKey(User, related_name="owners", on_delete=models.SET_NULL, null=True)
     expiry_start = models.DateField(null=True)
     expiry_end = models.DateField(null=True)
+    STATUS_CHOICES = (
+        (1, '보유'),
+        (2, '삭제'),
+        (3, '반품'),
+    )
+    status = models.IntegerField(default=1, choices=STATUS_CHOICES)
+    status_edit_date = models.DateTimeField(null=True)
