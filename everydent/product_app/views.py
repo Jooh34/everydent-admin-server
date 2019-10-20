@@ -196,15 +196,31 @@ def product_detail(request, pk):
 @api_view(['POST'])
 def product_status_list(request):
     if request.method == 'POST':
-        full_code = request.data.get('full_code', '')
-        products = Product.objects.filter(status=1, full_code=full_code)
-        if len(products) > 0:
-            product = products[0]
-            new_status = request.data['status']
-            product.status = new_status
-            product.save()
+        error_message = []
+
+        stock_list = request.data['list']
+        print(stock_list)
+        new_status = request.data['status']
+        print(status)
+
+        for i, stock in enumerate(stock_list):
+            full_code = stock['full_code']
+            products = Product.objects.filter(status=1, full_code=full_code)
+            if len(products) > 0:
+                product = products[0]
+                new_status = request.data['status']
+                product.status = new_status
+                product.save()
+            else:
+                error_message.append('{}번째 : {} 은 재고목록에 존재하지 않아 처리되지 않았습니다.\n'.format(i+1, stock['name']))
+
+        print(error_message)
+        if len(error_message) == 0:
             return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            print(error_message)
+            print('\n'.join(error_message))
+            return Response({'error_message' : '\n'.join(error_message)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def product_status_detail(request, pk):
@@ -217,7 +233,7 @@ def product_status_detail(request, pk):
         new_status = request.data['status']
         product.status = new_status
         product.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response({'name': product.product_info.name}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def stock_list(request, product_info_id):
