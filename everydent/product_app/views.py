@@ -26,7 +26,7 @@ def expiry_list(request):
     THRESHOLD_DAYS = 365
     if request.method == 'GET':
         time_threshold = datetime.now() + timedelta(days=THRESHOLD_DAYS)
-        expiry_list = Product.objects.filter(status=1, expiry_end__lt=time_threshold)
+        expiry_list = Product.objects.filter(status=1, expiry_end__lt=time_threshold).order_by('expiry_end')
         serializer = ProductSerializer(expiry_list, many=True)
         return Response(serializer.data)
 
@@ -38,7 +38,6 @@ def running_out_list(request):
         product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set')).order_by('num_product')
         for productinfo in product_info_list:
             if productinfo.product_set.count() <= THRESHOLD_COUNTS:
-                print(productinfo.product_set.count())
                 result.append(productinfo)
 
         serializer = ProductInfoSerializer(result, many=True)
