@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.db.models import Count
 
 from django.shortcuts import render
 from rest_framework.decorators import api_view
@@ -33,10 +34,12 @@ def expiry_list(request):
 def running_out_list(request):
     THRESHOLD_COUNTS = 5
     if request.method == 'GET':
-        result = set()
-        for productinfo in ProductInfo.objects.all():
+        result = list()
+        product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set')).order_by('num_product')
+        for productinfo in product_info_list:
             if productinfo.product_set.count() <= THRESHOLD_COUNTS:
-                result.add(productinfo)
+                print(productinfo.product_set.count())
+                result.append(productinfo)
 
         serializer = ProductInfoSerializer(result, many=True)
         return Response(serializer.data)
