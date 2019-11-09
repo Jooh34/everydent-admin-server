@@ -201,13 +201,14 @@ def product_status_list(request):
         error_message = []
 
         stock_list = request.data['list']
-        print(stock_list)
         new_status = request.data['status']
-        print(status)
 
         for i, stock in enumerate(stock_list):
             full_code = stock['full_code']
-            products = Product.objects.filter(status=1, full_code=full_code)
+            print(len(full_code.strip()))
+            print(len(Product.objects.get(id=3189).full_code))
+            products = Product.objects.filter(status=1, full_code=full_code.strip())
+            print(products)
             if len(products) > 0:
                 product = products[0]
                 new_status = request.data['status']
