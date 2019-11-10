@@ -14,16 +14,25 @@ import re
 @api_view(['GET'])
 def count_info(request):
     if request.method == 'GET':
+        result = []
+        for productinfo in ProductInfo.objects.all():
+            # check duplication
+            if productinfo.name in result:
+                pass
+            else:
+                result.append(productinfo.name,)
+
+
         data = {
             'product_count': Product.objects.filter(status=1).count(),
-            'product_info_count': ProductInfo.objects.all().count(),
+            'product_info_count': len(result),
             'manufacturer_count': Manufacturer.objects.all().count(),
         }
         return Response(data)
 
 @api_view(['GET'])
 def expiry_list(request):
-    THRESHOLD_DAYS = 365
+    THRESHOLD_DAYS = 100
     if request.method == 'GET':
         time_threshold = datetime.now() + timedelta(days=THRESHOLD_DAYS)
         expiry_list = Product.objects.filter(status=1, expiry_end__lt=time_threshold).order_by('expiry_end')
@@ -32,16 +41,39 @@ def expiry_list(request):
 
 @api_view(['GET'])
 def running_out_list(request):
+    def is_name_exist(name, list):
+        for el in list:
+            if name == el['name']:
+                return True
+        return False
+
     THRESHOLD_COUNTS = 5
     if request.method == 'GET':
-        result = list()
-        product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set', filter=Q(product_set__status=1))).order_by('num_product')
+        result = []
+        product_info_list = ProductInfo.objects.all()
+        #product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set', filter=Q(product_set__status=1))).order_by('num_product')
         for productinfo in product_info_list:
             if productinfo.product_set.count() <= THRESHOLD_COUNTS:
-                result.append(productinfo)
+                # count all same name of p_i
+                pi_list = ProductInfo.objects.filter(name=productinfo.name)
+                sum = 0
+                for pi in pi_list:
+                    sum = sum + Product.objects.filter(status=1, product_info=pi).count()
 
-        serializer = ProductInfoSerializer(result, many=True)
-        return Response(serializer.data)
+                # check sum
+                if sum <= THRESHOLD_COUNTS:
+                    # check duplication
+                    if is_name_exist(productinfo.name, result):
+                        pass
+                    else:
+                        result.append({
+                            'name' : productinfo.name,
+                            'manufacturer_name' : productinfo.manufacturer.name,
+                            'product_total_count' : sum,
+                        })
+
+        result = sorted(result, key=lambda pi: pi['product_total_count'])
+        return Response(result)
 
 @api_view(['GET', 'POST'])
 def manufacturer_list(request):
@@ -81,14 +113,43 @@ def manufacturer_detail(request, pk):
 
 @api_view(['GET', 'POST'])
 def product_info_list(request):
+    def is_name_exist(name, list):
+        for el in list:
+            if name == el['name']:
+                return True
+        return False
+
     if request.method == 'GET':
+        result = []
+
         product_info_list = ProductInfo.objects.all().order_by("name")
         convert = lambda text: int(text) if text.isdigit() else text
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key.name) ]
         product_info_list = sorted( product_info_list, key=alphanum_key )
 
-        serializer = ProductInfoSerializer(product_info_list, many=True)
-        return Response(serializer.data)
+        for productinfo in product_info_list:
+            # count all same name of p_i
+            pi_list = ProductInfo.objects.filter(name=productinfo.name)
+            product_sum = 0
+            returned_sum = 0
+            for pi in pi_list:
+                product_sum = product_sum + Product.objects.filter(status=1, product_info=pi).count()
+                returned_sum = returned_sum + Product.objects.filter(status=3, product_info=pi).count()
+
+            # check duplication
+            if is_name_exist(productinfo.name, result):
+                pass
+            else:
+                result.append({
+                    'id' : productinfo.id,
+                    'name' : productinfo.name,
+                    'code' : productinfo.code,
+                    'manufacturer_name' : productinfo.manufacturer.name,
+                    'product_total_count' : product_sum,
+                    'returned_total_count' : returned_sum,
+                })
+
+        return Response(result)
 
     elif request.method == 'POST':
         serializer = ProductInfoSerializer(data=request.data, partial=True)
@@ -245,8 +306,12 @@ def stock_list(request, product_info_id):
     except ProductInfo.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    stock_list = Product.objects.filter(status=1, product_info=product_info)
-
     if request.method == 'GET':
-        serializer = ProductSerializer(stock_list, many=True)
+        # get all same name product_infos
+        pi_list = ProductInfo.objects.filter(name=product_info.name)
+        queryset_sum = Product.objects.none()
+        for pi in pi_list:
+            queryset_sum |= Product.objects.filter(status=1, product_info=pi)
+
+        serializer = ProductSerializer(queryset_sum, many=True)
         return Response(serializer.data)
