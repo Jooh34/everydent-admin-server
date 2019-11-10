@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from django.db.models import Count
+from django.db.models import Q, Count
 
 from django.shortcuts import render
 from rest_framework.decorators import api_view
@@ -35,7 +35,7 @@ def running_out_list(request):
     THRESHOLD_COUNTS = 5
     if request.method == 'GET':
         result = list()
-        product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set')).order_by('num_product')
+        product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set', filter=Q(product_set__status=1))).order_by('num_product')
         for productinfo in product_info_list:
             if productinfo.product_set.count() <= THRESHOLD_COUNTS:
                 result.append(productinfo)
