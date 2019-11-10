@@ -144,6 +144,7 @@ def product_info_list(request):
                     'id' : productinfo.id,
                     'name' : productinfo.name,
                     'code' : productinfo.code,
+                    'manufacturer' : productinfo.manufacturer.id,
                     'manufacturer_name' : productinfo.manufacturer.name,
                     'product_total_count' : product_sum,
                     'returned_total_count' : returned_sum,
@@ -266,10 +267,7 @@ def product_status_list(request):
 
         for i, stock in enumerate(stock_list):
             full_code = stock['full_code']
-            print(len(full_code.strip()))
-            print(len(Product.objects.get(id=3189).full_code))
             products = Product.objects.filter(status=1, full_code=full_code.strip())
-            print(products)
             if len(products) > 0:
                 product = products[0]
                 new_status = request.data['status']
