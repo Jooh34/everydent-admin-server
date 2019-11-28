@@ -153,11 +153,15 @@ def product_info_list(request):
         return Response(result)
 
     elif request.method == 'POST':
+        if request.data.get('manufacturer', None) is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ProductInfoSerializer(data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'POST', 'DELETE'])
 def product_info_detail(request, pk):
