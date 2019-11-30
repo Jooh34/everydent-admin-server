@@ -172,14 +172,20 @@ def product_info_detail(request, pk):
 
     elif request.method == 'DELETE':
         product_info = ProductInfo.objects.get(pk=pk)
-        name = product_info.name
-        product_info.delete()
+        pi_list = ProductInfo.objects.filter(name=product_info.name)
+        for pi in pi_list:
+            productpi_info.delete()
+
         return Response({'name': name}, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
+        new_name = request.data['name']
         product_info = ProductInfo.objects.get(pk=pk)
-        product_info.name = request.data['name']
-        product_info.save()
+        pi_list = ProductInfo.objects.filter(name=product_info.name)
+        for pi in pi_list:
+            pi.name = new_name
+            pi.save()
+
         return Response(status=status.HTTP_200_OK)
 
     # elif request.method == 'POST':
@@ -197,6 +203,13 @@ def product_info_detail(request, pk):
     #     except:
     #         return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET', 'POST', 'DELETE'])
+def product_info_all_list(request):
+    if request.method == 'GET':
+        pi_list = ProductInfo.objects.all()
+        serializer = ProductInfoSerializer(pi_list, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 
 @api_view(['GET', 'POST', 'DELETE'])
 def product_list(request):
