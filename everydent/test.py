@@ -48,9 +48,6 @@ from product_app.models import Product, ProductInfo, Manufacturer
 #     else:
 #         exist_list.append(pi.name)
 
-dict_list = []
-dict_list.append({
-    'name' : 'name1',
-    'product_count' : 3,
-})
-print(dict_list[0]['name'])
+#product_list = ProductInfo.objects.filter(name__icontains='Ts')
+#for p in product_list:
+#    p.delete()
