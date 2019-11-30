@@ -174,9 +174,9 @@ def product_info_detail(request, pk):
         product_info = ProductInfo.objects.get(pk=pk)
         pi_list = ProductInfo.objects.filter(name=product_info.name)
         for pi in pi_list:
-            productpi_info.delete()
+            pi.delete()
 
-        return Response({'name': name}, status=status.HTTP_200_OK)
+        return Response({'name': product_info.name}, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
         new_name = request.data['name']
@@ -209,7 +209,7 @@ def product_info_all_list(request):
         pi_list = ProductInfo.objects.all()
         serializer = ProductInfoSerializer(pi_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
 
 @api_view(['GET', 'POST', 'DELETE'])
 def product_list(request):
