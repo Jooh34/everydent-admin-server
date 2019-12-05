@@ -132,8 +132,10 @@ def product_info_list(request):
             pi_list = ProductInfo.objects.filter(name=productinfo.name)
             product_sum = 0
             returned_sum = 0
+            used_sum = 0
             for pi in pi_list:
                 product_sum = product_sum + Product.objects.filter(status=1, product_info=pi).count()
+                used_sum = used_sum + Product.objects.filter(status=2, product_info=pi).count()
                 returned_sum = returned_sum + Product.objects.filter(status=3, product_info=pi).count()
 
             # check duplication
@@ -147,6 +149,7 @@ def product_info_list(request):
                     'manufacturer' : productinfo.manufacturer.id,
                     'manufacturer_name' : productinfo.manufacturer.name,
                     'product_total_count' : product_sum,
+                    'used_total_count' : used_sum,
                     'returned_total_count' : returned_sum,
                 })
 
