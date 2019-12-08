@@ -47,13 +47,12 @@ def running_out_list(request):
                 return True
         return False
 
-    THRESHOLD_COUNTS = 5
     if request.method == 'GET':
         result = []
         product_info_list = ProductInfo.objects.all()
         #product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set', filter=Q(product_set__status=1))).order_by('num_product')
         for productinfo in product_info_list:
-            if productinfo.product_set.count() <= THRESHOLD_COUNTS:
+            if productinfo.product_set.count() < productinfo.min_stock:
                 # count all same name of p_i
                 pi_list = ProductInfo.objects.filter(name=productinfo.name)
                 sum = 0
@@ -61,7 +60,7 @@ def running_out_list(request):
                     sum = sum + Product.objects.filter(status=1, product_info=pi).count()
 
                 # check sum
-                if sum <= THRESHOLD_COUNTS:
+                if sum < productinfo.min_stock:
                     # check duplication
                     if is_name_exist(productinfo.name, result):
                         pass
@@ -70,6 +69,7 @@ def running_out_list(request):
                             'name' : productinfo.name,
                             'manufacturer_name' : productinfo.manufacturer.name,
                             'product_total_count' : sum,
+                            'product_min_stock': productinfo.min_stock,
                         })
 
         result = sorted(result, key=lambda pi: pi['product_total_count'])
@@ -151,6 +151,7 @@ def product_info_list(request):
                     'product_total_count' : product_sum,
                     'used_total_count' : used_sum,
                     'returned_total_count' : returned_sum,
+                    'min_stock' : productinfo.min_stock,
                 })
 
         return Response(result)
@@ -213,6 +214,18 @@ def product_info_all_list(request):
         serializer = ProductInfoSerializer(pi_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def product_min_stock(request):
+    if request.method == 'POST':
+        product_id_list = request.data['product_id_list']
+        count = request.data['count']
+        for product_id in product_id_list:
+            pi = ProductInfo.objects.get(id=product_id)
+            for product_info in ProductInfo.objects.filter(name=pi.name):
+                product_info.min_stock = count
+                product_info.save()
+
+        return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET', 'POST', 'DELETE'])
 def product_list(request):

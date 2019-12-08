@@ -30,7 +30,7 @@ class ProductInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductInfo
-        fields = ("id", "name", "code", "manufacturer", "manufacturer_name", "product_count", "used_count", "returned_count")
+        fields = ("id", "name", "code", "manufacturer", "manufacturer_name", "product_count", "used_count", "returned_count", "min_stock")
 
 # 제품 재고 시리얼라이저
 class ProductSerializer(serializers.ModelSerializer):

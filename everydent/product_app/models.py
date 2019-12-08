@@ -9,6 +9,7 @@ class ProductInfo(models.Model):
     manufacturer = models.ForeignKey(Manufacturer, related_name='product_infos', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=20)
+    min_stock = models.IntegerField(default=3)
 
 class Product(models.Model):
     created_time = models.DateTimeField(auto_now=False, auto_now_add=True)
