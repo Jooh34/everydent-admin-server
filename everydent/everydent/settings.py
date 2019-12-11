@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'rest_framework',
     'knox',
     'corsheaders',
@@ -132,3 +133,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
     'DATETIME_FORMAT': "%Y-%m-%dT%H:%M:%S",
 }
+
+CRONJOBS = [
+    ('*/1 * * * *', 'product_app.cron.cron_job'),
+]
