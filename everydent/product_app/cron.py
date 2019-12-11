@@ -50,4 +50,6 @@ def cron_job():
             'send_reserve': '0',
             'callback': phone,
         }
-        requests.post(url = url, data = data)
+        r = requests.post(url = url, data = data)
+        pastebin_url = r.text
+        print("The pastebin URL is:%s"%pastebin_url)
