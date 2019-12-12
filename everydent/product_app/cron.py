@@ -38,23 +38,29 @@ def cron_job():
 
     result = sorted(result, key=lambda pi: pi['product_total_count'])
 
+    str_list = []
+
     str = ''
     for el in result:
+        if len(str) > 700:
+            str_list.append(str)
+            str = ''
         str += '{} ({}/{})\n'.format(el['name'], el['product_total_count'], el['product_min_stock'])
 
-    phones = ['01038953444']
 
-    for phone in phones:
-        url = "http://221.139.14.189/API/alimtalk_api"
-        data = {
-            'api_key': 'NJZ58CKQW8X1113',
-            'template_code': 'SJT_036954',
-            'variable': str,
-            'dstaddr': phone,
-            'next_type': '0',
-            'send_reserve': '0',
-            'callback': phone,
-        }
-        r = requests.post(url = url, data = data)
-        pastebin_url = r.text
-        print("The pastebin URL is:%s"%pastebin_url)
+    phones = ['01038953444']
+        for phone in phones:
+            for str in str_list:
+            url = "http://221.139.14.189/API/alimtalk_api"
+            data = {
+                'api_key': 'NJZ58CKQW8X1113',
+                'template_code': 'SJT_036954',
+                'variable': str,
+                'dstaddr': phone,
+                'next_type': '0',
+                'send_reserve': '0',
+                'callback': phone,
+            }
+            r = requests.post(url = url, data = data)
+            pastebin_url = r.text
+            print("The pastebin URL is:%s"%pastebin_url)
