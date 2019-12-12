@@ -36,8 +36,8 @@ def cron_job():
 
     str = ''
     for el in result:
-        str += '{} ({}/{})\n'.format(result['name'], result['product_total_count'], result['product_min_stock'])
-
+        str += '{} ({}/{})\n'.format(el['name'], el['product_total_count'], el['product_min_stock'])
+    
     phones = ['01038953444']
 
     for phone in phones:
@@ -45,7 +45,7 @@ def cron_job():
         data = {
             'api_key': 'NJZ58CKQW8X1113',
             'template_code': 'SJT_036954',
-            'variable': 'linux_test',
+            'variable': str,
             'dstaddr': phone,
             'next_type': '0',
             'send_reserve': '0',
