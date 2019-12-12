@@ -49,8 +49,8 @@ def cron_job():
 
 
     phones = ['01038953444']
-        for phone in phones:
-            for str in str_list:
+    for phone in phones:
+        for str in str_list:
             url = "http://221.139.14.189/API/alimtalk_api"
             data = {
                 'api_key': 'NJZ58CKQW8X1113',
