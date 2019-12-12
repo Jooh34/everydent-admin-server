@@ -135,5 +135,5 @@ REST_FRAMEWORK = {
 }
 
 CRONJOBS = [
-    ('* * * * *', 'product_app.cron.cron_job', '>> /home/ubuntu/everydent-admin-server/cron.log'),
+    ('* 0 * * *', 'product_app.cron.cron_job', '>> /home/ubuntu/everydent-admin-server/cron.log'),
 ]
