@@ -8,6 +8,7 @@ def cron_job():
                 return True
         return False
 
+    print("cron start!")
     result = []
     product_info_list = ProductInfo.objects.all()
     #product_info_list = ProductInfo.objects.all().annotate(num_product=Count('product_set', filter=Q(product_set__status=1))).order_by('num_product')
@@ -44,7 +45,7 @@ def cron_job():
         data = {
             'api_key': 'NJZ58CKQW8X1113',
             'template_code': 'SJT_036954',
-            'variable': str,
+            'variable': 'linux_test',
             'dstaddr': phone,
             'next_type': '0',
             'send_reserve': '0',
