@@ -48,7 +48,7 @@ def cron_job():
         str += '{} ({}/{})\n'.format(el['name'], el['product_total_count'], el['product_min_stock'])
 
 
-    phones = ['01038953444']
+    phones = ['01038953444', '01064763428']
     for phone in phones:
         for str in str_list:
             url = "http://221.139.14.189/API/alimtalk_api"
