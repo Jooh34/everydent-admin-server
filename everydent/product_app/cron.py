@@ -1,5 +1,9 @@
 import requests
-from .models import Manufacturer, ProductInfo, Product
+import os, django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "everydent.settings")
+django.setup()
+
+from product_app.models import Product, ProductInfo, Manufacturer
 
 def cron_job():
     def is_name_exist(name, list):
@@ -37,7 +41,7 @@ def cron_job():
     str = ''
     for el in result:
         str += '{} ({}/{})\n'.format(el['name'], el['product_total_count'], el['product_min_stock'])
-    
+
     phones = ['01038953444']
 
     for phone in phones:
