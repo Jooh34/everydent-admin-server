@@ -273,7 +273,6 @@ def product_detail(request, pk):
     except Product.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    print(request.method)
     if request.method == 'GET':
         serializer = ProductSerializer(product)
         return Response(serializer.data)
@@ -338,11 +337,12 @@ def stock_list(request, product_info_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
+        status = request.GET.get('status', 1)
         # get all same name product_infos
         pi_list = ProductInfo.objects.filter(name=product_info.name)
         queryset_sum = Product.objects.none()
         for pi in pi_list:
-            queryset_sum |= Product.objects.filter(status=1, product_info=pi)
+            queryset_sum |= Product.objects.filter(status=status, product_info=pi)
 
         serializer = ProductSerializer(queryset_sum, many=True)
         return Response(serializer.data)
