@@ -304,6 +304,7 @@ def product_status_list(request):
                 product = products[0]
                 new_status = request.data['status']
                 product.status = new_status
+                product.status_edit_date = datetime.now()
                 product.save()
             else:
                 error_message.append('{}번째 : {} 은 재고목록에 존재하지 않아 처리되지 않았습니다.\n'.format(i+1, stock['name']))
@@ -326,6 +327,7 @@ def product_status_detail(request, pk):
     if request.method == 'POST':
         new_status = request.data['status']
         product.status = new_status
+        product.status_edit_date = datetime.now()
         product.save()
         return Response({'name': product.product_info.name}, status=status.HTTP_200_OK)
 
